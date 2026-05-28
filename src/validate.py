@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text
 
-DR_URL = "postgresql://airflow:airflow@localhost:5432/geospatial"
+DR_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
 
 def validate_data():
 	engine = create_engine(DR_URL)

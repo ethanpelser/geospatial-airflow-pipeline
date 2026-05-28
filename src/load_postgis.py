@@ -3,7 +3,7 @@ from pathlib import Path
 import pyogrio
 from sqlalchemy import create_engine, text
 
-DB_URL = "postgresql://airflow:airflow@localhost:5432/geospatial"
+DB_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
 SHAPEFILE_PATH = Path("data/raw/osm/gis_osm_roads_free_1.shp")
 BATCH_SIZE = 2000
 MAX_ROWS = 10000

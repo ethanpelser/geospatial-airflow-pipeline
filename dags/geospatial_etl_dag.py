@@ -21,13 +21,14 @@ with DAG(
 
 	)
 
+	extract_data = BashOperator(
+		task_id = "extract_data",
+		bash_command = "cd /opt/airflow && python src/extract_data.py"
+	)
+
 	create_tables = BashOperator(
 	    task_id = "create_tables",
-	    bash_command= """
-	    docker exec -i geospatial_postgis \
-	    psql -U airflow -d geospatial \
-	    < /opt/airflow/sql/create_tables.sql
-	    """
+	    bash_command= "cd /opt/airflow && python src/create_table.py"
 	)
 
 	load_postgis = BashOperator(
@@ -38,7 +39,7 @@ with DAG(
 
 	validate_data = BashOperator(
 		task_id = "validate_data",
-		bash_command="cd /opt/airflow && python src/validate_data.py"
+		bash_command="cd /opt/airflow && python src/validate.py"
 	)
 
-	download_data >> create_tables >> load_postgis >> validate_data
+	download_data >> extract_data >> create_tables >> load_postgis >> validate_data

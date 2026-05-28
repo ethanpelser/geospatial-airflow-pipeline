@@ -1,5 +1,5 @@
 from pathlib import Path
-from sqlalchemmy import create_engine, text
+from sqlalchemy import create_engine, text
 
 SQL_FILE = Path("sql/create_tables.sql")
 DB_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
@@ -9,7 +9,7 @@ def create_table():
 	function to run sql code in order to create roads table
 	"""
 
-	IF NOT SQL_FILE.exists():
+	if not SQL_FILE.exists():
 		raise FileNotFoundError(f"SQL file not found: {SQL_FILE}")
 
 	engine = create_engine(DB_URL)
