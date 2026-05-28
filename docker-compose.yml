@@ -1,0 +1,42 @@
+services:
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: geospatial_postgis
+
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: geospatial
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+
+  airflow:
+    build: .
+    image: geospatial-airflow:latest
+
+    container_name: geospatial_airflow
+
+    depends_on:
+      - postgres
+
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./sql:/opt/airflow/sql
+
+    command: bash -c "airflow db migrate && airflow users create --username airflow --password airflow --firstname Ethan --lastname Pelser --role Admin --email ethan@example.com || true && airflow webserver --port 8080"
+
+volumes:
+  postgis_data:
