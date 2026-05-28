@@ -12,14 +12,24 @@ def download_file():
 
 	print("Download initiated")
 	
-	response = requests.get(URL, stream=True)
-	response.raise_for_status()
+	for attempt in range(1, 4):
+		try:
+			response = requests.get(URL, stream=True)
+			response.raise_for_status()
 
-	with open(OUTPUT_FILE, "wb") as file:
-		for chunk in response.iter_content(chunk_size = 8192):
-			file.write(chunk)
+			with open(OUTPUT_FILE, "wb") as file:
+				for chunk in response.iter_content(chunk_size = 8192):
+					file.write(chunk)
 
-	print("download complete")
+			print("download complete")
+			return
+
+		except requests.exceptions.RequestException as error:
+			print(f"Download failed {error}:")
+
+			if attempt == 3:
+				raise
+			time.sleep(10)
 
 if __name__ == "__main__":
 	download_file()
