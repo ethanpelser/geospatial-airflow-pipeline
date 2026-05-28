@@ -13,7 +13,7 @@ SELECT
 	ROUND(ST_LENGTH(geom::geography) / 1000) as road_length
 FROM roads
 WHERE name IS NOT NULL
-ORDER BY road_length
+ORDER BY road_length DESC
 LIMIT 10;
 
 -- Roads closest to Durban city center
@@ -23,12 +23,12 @@ SELECT
 	ROUND(
 		ST_Distance(
 			geom::geography,
-			ST_SetSRID(ST_MakePoint(32.0218, -29.8587), 4326):: geography
+			ST_SetSRID(ST_MakePoint(31.0218, -29.8587), 4326):: geography
 		)::numeric,
 		2
 	) AS distance_m
 FROM roads
-ORDER BY distance_m DESC
+ORDER BY distance_m ASC
 LIMIT 10;
 
 -- Count named and unamed roads

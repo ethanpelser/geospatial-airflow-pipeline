@@ -1,5 +1,6 @@
 from pathlib import Path
 import requests
+import time
 
 URL = "https://download.geofabrik.de/africa/south-africa-latest-free.shp.zip"
 
