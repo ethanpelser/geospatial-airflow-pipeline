@@ -115,7 +115,7 @@ geom		LineString geometry in EPSG:4326
 
 </> BASH
 
-git clone <your-repo-url>
+git clone https://github.com/ethanpelser/geospatial-airflow-pipeline.git
 cd geospatial-airflow-pipeline
 
 2. Create and activate virtual environment
