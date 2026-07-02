@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine, text
-
-DR_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
+from config import DATABASE_URL
 
 def validate_data():
-	engine = create_engine(DR_URL)
+	engine = create_engine(DATABASE_URL)
 	
 	checks = {
 		"row_count": """

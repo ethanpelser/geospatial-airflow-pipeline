@@ -1,9 +1,8 @@
 from pathlib import Path
-
 import pyogrio
 from sqlalchemy import create_engine, text
+from config import DATABASE_URL
 
-DB_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
 SHAPEFILE_PATH = Path("data/raw/osm/gis_osm_roads_free_1.shp")
 BATCH_SIZE = 2000
 MAX_ROWS = 10000
@@ -13,7 +12,7 @@ def load_roads_to_postgis():
 	"""Load OpenStreetMap roads shapefile into PostGIS in chunks and also clean it.
 	"""
 	print("connecting to PostGIS database")
-	engine = create_engine(DB_URL)
+	engine = create_engine(DATABASE_URL)
 	
 	print("Clearing existing roads table")
 

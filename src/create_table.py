@@ -1,8 +1,8 @@
 from pathlib import Path
 from sqlalchemy import create_engine, text
+from config import DATABASE_URL
 
 SQL_FILE = Path("sql/create_tables.sql")
-DB_URL = "postgresql://airflow:airflow@postgres:5432/geospatial"
 
 def create_table():
 	"""
@@ -12,7 +12,7 @@ def create_table():
 	if not SQL_FILE.exists():
 		raise FileNotFoundError(f"SQL file not found: {SQL_FILE}")
 
-	engine = create_engine(DB_URL)
+	engine = create_engine(DATABASE_URL)
 
 	with open(SQL_FILE, "r") as file:
 		sql = file.read()
