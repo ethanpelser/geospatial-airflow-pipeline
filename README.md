@@ -1,49 +1,61 @@
 # Geospatial Airflow ETL Pipeline
 
-## Project Overview
+## Overview
 
-This project is a geospatial data engineering pipeline that uses Apache Airflow, Docker, PostgreSQL/PostGIS, Python, and OpenStreetMap data.
+This project is an end-to-end geospatial ETL pipeline built with **Apache Airflow**, **Docker**, **PostgreSQL/PostGIS**, and **Python**.
 
-The pipeline downloads OpenStreetMap shapefile data for South Africa, extracts the dataset, creates a PostGIS table, loads road geometry data into PostgreSQL in chunks, and validates the loaded data.
+The pipeline downloads OpenStreetMap shapefile data from Geofabrik, extracts the dataset, creates the required PostGIS table, loads road geometries into PostgreSQL in chunks, and validates the imported data.
 
-The project is designed as a junior data engineering portfolio project and demonstrates workflow orchestration, Dockerized services, geospatial processing, chunked loading, and spatial SQL analysis.
+This project demonstrates several core data engineering concepts, including:
+
+- Workflow orchestration with Apache Airflow
+- Dockerized data pipelines
+- Geospatial data processing
+- Chunked data loading
+- Spatial SQL with PostGIS
+- ETL pipeline design and validation
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-- WSL Ubuntu
 - Python
 - Apache Airflow
 - Docker
 - Docker Compose
 - PostgreSQL
 - PostGIS
-- Pyogrio
 - GeoPandas
+- Pyogrio
 - SQLAlchemy
-- OpenStreetMap / Geofabrik data
+- OpenStreetMap (Geofabrik)
+- WSL Ubuntu
 
 ---
 
-## Pipeline Architecture
+# Pipeline Architecture
 
 ```text
 download_data
-    ↓
+      │
+      ▼
 extract_data
-    ↓
+      │
+      ▼
 create_tables
-    ↓
+      │
+      ▼
 load_postgis
-    ↓
+      │
+      ▼
 validate_data
+```
 
 ---
 
-##Project Structure
+# Project Structure
 
-
+```text
 geospatial-airflow-pipeline/
 │
 ├── dags/
@@ -68,223 +80,245 @@ geospatial-airflow-pipeline/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
 
 ---
 
-##Dataset
+# Dataset
 
-The project uses OpenStreetMap shapefile data from Geofabrik:
+The project uses OpenStreetMap shapefile data provided by Geofabrik.
+
+Download:
 
 https://download.geofabrik.de/africa/south-africa-latest-free.shp.zip
 
-This archive contains multiple geospatial layers, including roads, railways, buildings, land use, waterways, places, and points of interest.
+The archive contains multiple geospatial layers including:
 
-This project focuses on:
+- Roads
+- Railways
+- Buildings
+- Waterways
+- Land Use
+- Places
+- Points of Interest
 
+This project focuses on the road network contained in:
+
+```
 gis_osm_roads_free_1.shp
-
+```
 
 ---
 
-##Database Table
+# Database Schema
 
-The main PostGIS table is:
+The primary PostGIS table created by the pipeline is:
 
+```
 roads
+```
 
-
-Columns
-
-Column		Description
-
-id		Auto-generated primary key
-osm_id		Original OpenStreetMap object ID
-code		Numeric road classification
-fclass		Road type/class
-name		Road name
-ref		Road reference number
-oneway		Whether the road is one-way
-maxspeed	Speed limit
-geom		LineString geometry in EPSG:4326
+| Column | Description |
+|---------|-------------|
+| id | Auto-generated primary key |
+| osm_id | OpenStreetMap object ID |
+| code | Road classification code |
+| fclass | Road type/classification |
+| name | Road name |
+| ref | Road reference |
+| oneway | One-way indicator |
+| maxspeed | Speed limit |
+| geom | LineString geometry (EPSG:4326) |
 
 ---
 
-##How to Run the Project
+# How to Run
 
-1. Clone the repository
+## 1. Clone the repository
 
-</> BASH
-
+```bash
 git clone https://github.com/ethanpelser/geospatial-airflow-pipeline.git
 cd geospatial-airflow-pipeline
+```
 
-2. Create and activate virtual environment
+## 2. Create a virtual environment
 
-</> BASH
-
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
-3. Install Python dependencies
+## 3. Install dependencies
 
-</> BASH
+```bash
+pip install -r requirements.txt
+```
 
-pip insall -r requirements.txt
+## 4. Start Docker
 
-4. Start Docker services
-
-</> BASH
+```bash
 docker compose up --build -d
+```
 
-5. Start the Airflow Scheduler
+## 5. Start the Airflow Scheduler
 
-In a seperate terminal, run:
+In another terminal:
 
-</> BASH
-
+```bash
 docker exec -it geospatial_airflow airflow scheduler
+```
 
-Keep this terminal open while running the DAG
+Keep this terminal running while executing the DAG.
 
-6. Open Airflow
+## 6. Open Airflow
 
-In a browser go to http://localhost:8080
+Open your browser and navigate to:
 
-login: Username: airflow
-       Password: airflow
+```
+http://localhost:8080
+```
 
----
+Default login:
 
-##File Permission Setup
+Username:
 
-Because Airflow runs inside Docker as a different Linux user, the mounted data/ folder may need permission changes.
+```
+airflow
+```
 
-Run this from the project root before triggering the DAG
+Password:
 
-</> BASH
-
-sudo chown -R 50000:0 data
-sudo chmod -R 775 data
-
-
-If you need to edit or delete files locally again, give ownership back to your Ubuntu user:
-
-</> BASH
-
-sudo chown -R 50000:0 data
-sudo chmod -R 775 data
+```
+airflow
+```
 
 ---
 
-##Running the DAG
+# File Permissions
+
+Because Airflow runs inside Docker under a different Linux user, the mounted `data/` directory may require updated permissions.
+
+Before running the DAG:
+
+```bash
+sudo chown -R 50000:0 data
+sudo chmod -R 775 data
+```
+
+To restore ownership to your local Ubuntu user afterwards:
+
+```bash
+sudo chown -R $USER:$USER data
+```
+
+---
+
+# Running the Pipeline
 
 In the Airflow UI:
-	1. Open the DAG named: geospatial_etl_pipeline
-	2. Trigger the DAG manually!
 
-The DAG will
-	1. Download the OpenStreetMap shapefile zip
-	2. Extract the shapefile archive
-	3. Create the PostGIs table
-	4. Load road data into PostGIS table
-	5. Validate the loaded data
+1. Open **geospatial_etl_pipeline**
+2. Trigger the DAG manually
 
----
+The pipeline performs the following steps:
 
-##Chunked Loading
-
-The project loads the shapefile in chunks to avoid memory issues.
-
-Instead of loading the full South Africa roads dataset into RAM at once, load_postgis.py reads a limited number of rows per batch and uploads each batch to PostGIS.
-
-This helps prevent the process from being killed due to high memory usage.
-
-It also only loads the first 10000 entries into the database
+1. Download the OpenStreetMap archive
+2. Extract the shapefiles
+3. Create the PostGIS table
+4. Load road geometries into PostgreSQL
+5. Validate the imported data
 
 ---
 
-##Validation Checks
+# Chunked Loading
 
-The validation script checks:
+The South African road network contains a large number of features.
 
-total row count
-missing geometries
-geometry type
-SRID
-road type counts
+Instead of loading the entire shapefile into memory, the pipeline processes the data in batches before inserting it into PostgreSQL.
 
+This significantly reduces memory usage and makes the pipeline more scalable.
+
+For demonstration purposes, the current implementation loads the first **10,000** road features.
 
 ---
 
-##Useful commands
+# Validation
 
-Check running containers
+The validation script performs several checks after loading the data:
 
-</> Bash
+- Total row count
+- Missing geometries
+- Geometry type
+- SRID validation
+- Road classification counts
+
+---
+
+# Useful Docker Commands
+
+### View running containers
+
+```bash
 docker ps
+```
 
+### Start containers
 
-Start containers
-
-</> Bash
-
+```bash
 docker compose up -d
+```
 
+### Stop containers
 
-Stop containers
-
-</> Bash
-
+```bash
 docker compose down
+```
 
+### Rebuild the Airflow image
 
-Rebuild Airflow image after changing requirements
-
-</> Bash
-
+```bash
 docker compose build airflow
 docker compose up -d
+```
 
+### Connect to PostgreSQL
 
-Connect to PostGIS
-
-</> Bash
-
+```bash
 docker exec -it geospatial_postgis psql -U airflow -d geospatial
-
-
----
-
-##Problems Solved
-
-During this project, several real data engineering problems were solved
-
-1. Docker container networking
-2. Airflow DAG import errors
-3. File permission issues with Docker bind mounts
-4. PostGIS version compatability
-5. Memory limits when processing large geospatial datasets
-6. Chunked shapefile loading
-7. Database validation
-8. Airflow task orchestration
+```
 
 ---
 
-##Possible Future Improvements
+# Challenges Solved
 
-Possible future improvements:
+During development, the project involved solving several real-world engineering problems:
 
-Load the full dataset instead of a limited sample
-Add spatial indexes for faster queries
-Add a dashboard with Streamlit
-Store raw data in AWS S3
-Add automated tests
-Use Airflow connections instead of hardcoded database URLs
-Use environment variables for credentials
-Add screenshots of successful DAG runs and query results
+- Docker networking
+- Airflow DAG import issues
+- Docker file permission problems
+- PostgreSQL/PostGIS version compatibility
+- Processing large geospatial datasets
+- Chunked shapefile loading
+- Database validation
+- Airflow workflow orchestration
 
 ---
 
-##Author
+# Future Improvements
 
-Ethan Pelser
+Potential enhancements include:
+
+- Load the complete road dataset
+- Add spatial indexes for improved query performance
+- Integrate AWS S3 for raw data storage
+- Configure Airflow Connections instead of hardcoded connection strings
+- Store credentials in environment variables
+- Add automated unit and integration tests
+- Build a Streamlit dashboard
+- Include screenshots of DAG runs and query results
+
+---
+
+# Author
+
+**Ethan Pelser**
